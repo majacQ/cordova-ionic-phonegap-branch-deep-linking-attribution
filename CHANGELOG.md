@@ -1,7 +1,34 @@
+<a name="3.4.0"></a>
+# [3.4.0](https://github.com/BranchMetrics/cordova-ionic-phonegap-branch-deep-linking/compare/v3.2.1...v3.4.0) (2020-2-26)
+
+* Update iOS SDK to 0.31.4
+* Update Android SDK to 4.3.2
+
+<a name="3.2.1"></a>
+# [3.2.1](https://github.com/BranchMetrics/cordova-ionic-phonegap-branch-deep-linking/compare/v3.2.0...v3.2.1) (2020-1-10)
+
+* Fix uses-sdk issue.
+
+<a name="3.2.0"></a>
+# [3.2.0](https://github.com/BranchMetrics/cordova-ionic-phonegap-branch-deep-linking/compare/v3.1.6...v3.2.0) (2019-5-24)
+
+* Fix Cordova 9 incompatibility.
+* Fix aar not found on Android builds.
+
+<a name="3.1.6"></a>
+# [3.1.6](https://github.com/BranchMetrics/cordova-ionic-phonegap-branch-deep-linking/compare/v3.1.5...v3.1.6) (2019-2-28)
+
+* Upgraded base Branch SDKs to iOS 0.25.11 and Android 3.0.4
+
+<a name="3.1.5"></a>
+# [3.1.5](https://github.com/BranchMetrics/cordova-ionic-phonegap-branch-deep-linking/compare/v3.1.4...v3.1.5) (2018-12-05)
+
+* Fix iOS dependency issue.
+
 <a name="3.1.4"></a>
 # [3.1.4](https://github.com/BranchMetrics/cordova-ionic-phonegap-branch-deep-linking/compare/v3.1.3...v3.1.4) (2018-12-04)
 
-* Rever Cocoapods & Gradle support temporarily.([#478](https://github.com/BranchMetrics/cordova-ionic-phonegap-branch-deep-linking/pull/531))
+* Revert Cocoapods & Gradle support temporarily.([#478](https://github.com/BranchMetrics/cordova-ionic-phonegap-branch-deep-linking/pull/531))
 
 <a name="3.1.3"></a>
 # [3.1.3](https://github.com/BranchMetrics/cordova-ionic-phonegap-branch-deep-linking/compare/v3.1.0...v3.1.3) (2018-11-26)
