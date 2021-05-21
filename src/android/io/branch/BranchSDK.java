@@ -20,6 +20,8 @@ import java.util.Iterator;
 
 import io.branch.indexing.BranchUniversalObject;
 import io.branch.referral.Branch;
+import io.branch.referral.BranchUtil;
+import io.branch.referral.PrefHelper;
 import io.branch.referral.BranchError;
 import io.branch.referral.BranchViewHandler;
 import io.branch.referral.SharingHelper;
@@ -31,8 +33,9 @@ import io.branch.referral.util.Product;
 import io.branch.referral.util.ProductCategory;
 import io.branch.referral.util.ShareSheetStyle;
 
-import io.branch.referral.util.BranchCrossPlatformId;
-import io.branch.referral.util.BranchLastAttributedTouchData;
+import io.branch.referral.ServerRequestGetLATD.BranchLastAttributedTouchDataListener;
+import io.branch.referral.ServerRequestGetCPID.BranchCrossPlatformIdListener;
+import io.branch.referral.util.BranchCPID;
 
 public class BranchSDK extends CordovaPlugin {
 
@@ -41,6 +44,8 @@ public class BranchSDK extends CordovaPlugin {
 
     // Standard Debugging Variables
     private static final String LCAT = "CordovaBranchSDK";
+    // todo pick up plugin version dynamically
+    private static final String BRANCH_PLUGIN_VERSION = "4.1.3";
 
     // Private Method Properties
     private ArrayList<BranchUniversalObjectWrapper> branchObjectWrappers;
@@ -66,19 +71,20 @@ public class BranchSDK extends CordovaPlugin {
     protected void pluginInitialize() {
 
         this.activity = this.cordova.getActivity();
-
         Branch.disableInstantDeepLinking(true);
-        Branch.getAutoInstance(this.activity.getApplicationContext());
-
+        BranchUtil.setPluginType(BranchUtil.PluginType.CordovaIonic);
+        BranchUtil.setPluginVersion(BRANCH_PLUGIN_VERSION);
+        if (this.instance == null) {
+            this.instance = Branch.getAutoInstance(this.activity.getApplicationContext());
+        }
     }
 
     /**
      * Called when the activity receives a new intent.
      */
     public void onNewIntent(Intent intent) {
-
+        intent.putExtra("branch_force_new_session", true);
         this.activity.setIntent(intent);
-
     }
 
     /**
@@ -257,11 +263,15 @@ public class BranchSDK extends CordovaPlugin {
     }
     
     public void crossPlatformIds(CallbackContext callbackContext) {
-        this.instance.getCrossPlatformIds(new BranchCPIDListener(callbackContext));
+        // stub call from known issue with caching
+        // this.instance.getCrossPlatformIds(new BranchCPIDListener(callbackContext));
+        callbackContext.sendPluginResult(new PluginResult(PluginResult.Status.OK, false));
     }
 
     public void lastAttributedTouchData(CallbackContext callbackContext) {
-        this.instance.getLastAttributedTouchData(new BranchLATDListener(callbackContext), 30);
+        // stub call from known issue with caching
+        // this.instance.getLastAttributedTouchData(new BranchLATDListener(callbackContext), 30);
+        callbackContext.sendPluginResult(new PluginResult(PluginResult.Status.OK, false));
     }
 
     //////////////////////////////////////////////////
@@ -284,9 +294,7 @@ public class BranchSDK extends CordovaPlugin {
             this.deepLinkUrl = data.toString();
         }
 
-        this.instance = Branch.getAutoInstance(this.activity.getApplicationContext());
         this.instance.initSession(new SessionListener(callbackContext), data, activity);
-
     }
 
     /**
@@ -597,10 +605,8 @@ public class BranchSDK extends CordovaPlugin {
 
         this.activity = this.cordova.getActivity();
 
-        Branch instance = Branch.getAutoInstance(this.activity.getApplicationContext());
-
         if (linkDomain != null) {
-            instance.enableCookieBasedMatching(linkDomain);
+            Branch.enableCookieBasedMatching(linkDomain);
         }
 
         callbackContext.success("Success");
@@ -615,7 +621,7 @@ public class BranchSDK extends CordovaPlugin {
      */
     private void setDebug(boolean isEnable, CallbackContext callbackContext) {
         this.activity = this.cordova.getActivity();
-        Branch.getAutoInstance(this.activity.getApplicationContext()).setDebug();
+        Branch.enableDebugMode();
         callbackContext.sendPluginResult(new PluginResult(PluginResult.Status.OK, isEnable));
     }
 
@@ -629,7 +635,8 @@ public class BranchSDK extends CordovaPlugin {
      */
     private void disableTracking(boolean isEnable, CallbackContext callbackContext) {
         this.activity = this.cordova.getActivity();
-        Branch.getAutoInstance(this.activity.getApplicationContext()).disableTracking(isEnable);
+
+        this.instance.disableTracking(isEnable);
         callbackContext.sendPluginResult(new PluginResult(PluginResult.Status.OK, isEnable));
     }
 
@@ -817,6 +824,8 @@ public class BranchSDK extends CordovaPlugin {
                 event.setDescription(metaData.getString("description"));
             } else if (key.equals("searchQuery")) {
                 event.setSearchQuery(metaData.getString("searchQuery"));
+            } else if (key.equals("customerEventAlias")) {
+                event.setCustomerEventAlias(metaData.getString("customerEventAlias"));
             } else if (key.equals("customData")) {
                 JSONObject customData = metaData.getJSONObject("customData");
                 keys = customData.keys();
@@ -874,7 +883,7 @@ public class BranchSDK extends CordovaPlugin {
     //----------- INNER CLASS LISTENERS ------------//
     //////////////////////////////////////////////////
 
-    protected class BranchCPIDListener implements BranchCrossPlatformId.BranchCrossPlatformIdListener {
+    protected class BranchCPIDListener implements BranchCrossPlatformIdListener {
         private CallbackContext _callbackContext;
 
         public BranchCPIDListener(CallbackContext callbackContext) {
@@ -882,7 +891,7 @@ public class BranchSDK extends CordovaPlugin {
         }
 
         @Override
-        public void onDataFetched(BranchCrossPlatformId.BranchCPID branchCPID, BranchError error) {
+        public void onDataFetched(BranchCPID branchCPID, BranchError error) {
             if (error != null) {
                 Log.d(LCAT, "CPID unavailable");
                 this._callbackContext.error("CPID unavailable");
@@ -894,8 +903,9 @@ public class BranchSDK extends CordovaPlugin {
                     jsonObject.put("cross_platform_id", branchCPID.getCrossPlatformID());
                     jsonObject.put("past_cross_platform_ids", branchCPID.getPastCrossPlatformIds());
                     jsonObject.put("prob_cross_platform_ids", branchCPID.getProbabilisticCrossPlatformIds());
-                } catch (Exception e) {
+                } catch (JSONException e) {
                     // just send back and empty object on json error
+                    jsonObject = new JSONObject();
                 }
 
                 Log.d(LCAT, jsonObject.toString());
@@ -906,7 +916,7 @@ public class BranchSDK extends CordovaPlugin {
         }
     }
 
-    protected class BranchLATDListener implements BranchLastAttributedTouchData.BranchLastAttributedTouchDataListener {
+    protected class BranchLATDListener implements BranchLastAttributedTouchDataListener {
         private CallbackContext _callbackContext;
 
         public BranchLATDListener(CallbackContext callbackContext) {

@@ -1,15 +1,37 @@
 <a name="4.0.0"></a>
-# [4.0.0](https://github.com/BranchMetrics/cordova-ionic-phonegap-branch-deep-linking/compare/v3.2.0...v4.0.0) (2019-10-10)
+# [4.1.3](https://github.com/BranchMetrics/cordova-ionic-phonegap-branch-deep-linking/compare/v4.1.2...v4.1.3) (2020-2-20)
+
+* Fix intra-app linking.
+
+# [4.1.2](https://github.com/BranchMetrics/cordova-ionic-phonegap-branch-deep-linking/compare/v4.1.1...v4.1.2) (2020-2-12)
+
+* Allow Cordova 8. Update readme with instructions.
+
+# [4.1.1](https://github.com/BranchMetrics/cordova-ionic-phonegap-branch-deep-linking/compare/v4.1.0...v4.1.1) (2020-2-3)
+
+* Hotfix removing typo in iOS code
+
+# [4.1.0](https://github.com/BranchMetrics/cordova-ionic-phonegap-branch-deep-linking/compare/v4.0.0...v4.1.0) (2020-2-3)
+
+* Update update iOS SDK 0.31.x
+* Update update Android SDK 4.3.2
+* Set plugin type/name and version
+
+# [4.0.0](https://github.com/BranchMetrics/cordova-ionic-phonegap-branch-deep-linking/compare/v3.2.0...v4.0.0) (2019-10-15)
 
 * Update iOS SDK to 0.29.1
-* Update Android SDK to 4.1.0
+* Update Android SDK to 4.1.1
 * Switch to Cocoapods
 * Switch to Maven
+* Add Event Alias
 * Add CPID and LATD methods
+* Add Amazon Fire ID
+* Fix foreground linking
 
 Known issues:
-iOS command line build fails due to switch to cocoapods.  https://github.com/apache/cordova-ios/issues/659
-CPID and LATD methods do not work on Android.
+* iOS command line build fails due a cordova issue, workaround is to build from xcode.  SDK-558  https://github.com/apache/cordova-ios/issues/659
+* Android installation hooks require Android platform to be added before the plugin.  SDK-585
+* CPID and LATD methods do not work on Android.  SDK-557
 
 <a name="3.2.0"></a>
 # [3.2.0](https://github.com/BranchMetrics/cordova-ionic-phonegap-branch-deep-linking/compare/v3.1.6...v3.2.0) (2019-5-24)
